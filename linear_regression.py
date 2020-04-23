@@ -45,7 +45,7 @@ def mse(response_v, prediction_v):
 
 def load_data(path):
     """
-    Task 12
+    Task 12 and 13
     This function is loading the data set and performing all the needed preprocessing so to get
     a design balid matrix
     :param path: path to the cv file that loads the my_dtet
@@ -57,6 +57,7 @@ def load_data(path):
 
 
     # Delete all corrupted data
+    my_dt.drop(my_dt[my_dt['sqft_basement'] <= 0].index, inplace=True)
     my_dt.drop(my_dt[my_dt['sqft_above'] <= 0].index, inplace=True)
     my_dt.drop(my_dt[my_dt["price"] <= 0].index, inplace=True)
     my_dt.drop(my_dt[my_dt["bedrooms"]<=0].index, inplace=True)
@@ -65,9 +66,12 @@ def load_data(path):
     my_dt.drop(my_dt[my_dt["sqft_living15"] <= 0].index, inplace=True)
     my_dt.drop(my_dt[my_dt["sqft_lot"]<=0].index, inplace=True)
     my_dt.drop(my_dt[my_dt["sqft_lot15"] <= 0].index, inplace=True)
-    my_dt.drop(my_dt[my_dt["floors"]<=0].index, inplace=True)
+    my_dt.drop(my_dt[my_dt["floors"]<0].index, inplace=True)
 
     # Delete all no relevant data
+    my_dt.drop(["id", "date"], axis=1, inplace=True)
+
+    # Q13
     my_price = my_dt["price"]
     my_dt.drop(['price'], 1, inplace=True)
 
@@ -76,3 +80,23 @@ def load_data(path):
     my_dt = pandas.get_dummies(my_dt, columns=["zipcode"])
 
     return my_dt, my_price
+
+
+def plot_singular_values(collect_val):
+    """
+    Task 14
+    :param collect_val: singular values
+    :return: Plot the singular values in descending order
+    """
+    sorted(collect_val)
+    reversed(collect_val)
+    plt.plot(collect_val)
+    plt.xlabel("Indexes")
+    plt.ylabel("Singular Values")
+    plt.title("Q15 : Singular values in descending order")
+    plt.show()
+
+#Task 15
+my_dt, price = load_data("kc_house_data.csv")
+mat = np.linalg.svd(my_dt, compute_uv=False)
+plot_singular_values(mat)
