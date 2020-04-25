@@ -1,8 +1,6 @@
 import numpy as np
 import pandas
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-from scipy.linalg import qr
 
 def fit_linear_regression(X, y):
     """
@@ -97,6 +95,52 @@ def plot_singular_values(collect_val):
     plt.show()
 
 #Task 15
+# my_dt, price = load_data("kc_house_data.csv")
+# mat = np.linalg.svd(my_dt, compute_uv=False)
+# plot_singular_values(mat)
+
+
+def train_test_set_random(data):
+    """
+    Task 16
+    Fit a model and test it over the data. First split the data into train and test sets randomaly,
+    such that the size of the test set is 1/4 of the total data.
+    Over 3/4 of the data, fit a model based on the first p% of the training set.
+    Then use the predict function.
+    :param data: my data to test and fit over a model
+    :return:
+    """
+    index = int(len(data)*0.75)
+    train_dt = data[:index] # 75 first percent
+    test_dt = data[index:]
+
+    for p in range(1,100):
+        pass
+
+
+def feature_evaluation(matrix, response_vect):
+    """
+    Task 17
+    This function plots for every non-categorical feature, a graph of the feature values and the
+    response values. Also computes and shows on the graph the Pearson Correlation between the feature
+    and the response.
+    :param matrix: design matrix
+    :param response_vect: response vector
+    :return:
+    """
+    print(matrix.columns)
+
+    for column in matrix.columns[1:18] :
+        first = np.cov(matrix[column], response_vect)
+        scd = np.std(response_vect) * np.std(matrix[column])
+        correlation = first / scd
+        plt.scatter(matrix[column], response_vect)
+        plt.title("Scatter plot of the " + str(column) + " column and the response value.\nPearson Correlation : %f" % correlation[1][0])
+        plt.xlabel(column)
+        plt.ylabel("Response value")
+        # plt.show()
+
+
+# Task 17
 my_dt, price = load_data("kc_house_data.csv")
-mat = np.linalg.svd(my_dt, compute_uv=False)
-plot_singular_values(mat)
+feature_evaluation(my_dt, price)
