@@ -1,6 +1,7 @@
 import numpy as np
 import pandas
 import matplotlib.pyplot as plt
+import random
 
 def fit_linear_regression(X, y):
     """
@@ -50,7 +51,7 @@ def load_data(path):
     :return: valid design matrix
     """
 
-    my_dt = pandas.read_csv("kc_house_data.csv")
+    my_dt = pandas.read_csv(path)
     my_dt.dropna(how="any", inplace=True)  # If any NA values are present, drop that row or column.
 
 
@@ -68,6 +69,7 @@ def load_data(path):
 
     # Delete all no relevant data
     my_dt.drop(["id", "date"], axis=1, inplace=True)
+    # my_dt.drop(['long', 'lat', 'id', 'date', 'yr_built'], axis=1, inplace=True)
 
     # Q13
     my_price = my_dt["price"]
@@ -75,8 +77,8 @@ def load_data(path):
 
     my_dt.insert(loc=0, column="base", value=[1 for i in range(len(my_dt))])
 
-    # my_dt = pandas.get_dummies(my_dt, columns=["zipcode"])
-    my_dt.drop(["zipcode"], 1, inplace=True)
+    my_dt = pandas.get_dummies(my_dt, columns=["zipcode"])
+    # my_dt.drop(["zipcode"], 1, inplace=True)
 
     return my_dt, my_price
 
@@ -87,21 +89,21 @@ def plot_singular_values(collect_val):
     :param collect_val: singular values
     :return: Plot the singular values in descending order
     """
-    sorted(collect_val)
-    reversed(collect_val)
-    plt.plot(collect_val)
+
+    my_col = np.sort(collect_val)[::-1]
+    plt.plot(my_col)
     plt.xlabel("Indexes")
     plt.ylabel("Singular Values")
     plt.title("Q15 : Singular values in descending order")
     plt.show()
 
-#Task 15
+# Task 15
 # my_dt, price = load_data("kc_house_data.csv")
 # mat = np.linalg.svd(my_dt, compute_uv=False)
 # plot_singular_values(mat)
 
 
-def train_test_set_random(data):
+def train_test_set_random(data, price):
     """
     Task 16
     Fit a model and test it over the data. First split the data into train and test sets randomaly,
@@ -111,12 +113,48 @@ def train_test_set_random(data):
     :param data: my data to test and fit over a model
     :return:
     """
+
+    # print(data)
+
+    all_mse = []
     index = int(len(data)*0.75)
+
+    data.insert(0, "price", price.values)
+    # sklearn.model_selection.train_test_split()
+
+    random.shuffle(data.to_numpy())
+
     train_dt = data[:index] # 75 first percent
     test_dt = data[index:]
 
-    for p in range(1,100):
-        pass
+    test_price = test_dt["price"]
+    test_dt.drop(["price"], 1, inplace=True)
+
+
+    for p in range(1,101):
+
+        index = int(p/100 * len(train_dt))
+        new_train = train_dt[:index]
+
+        my_price = new_train["price"]
+        new_train.drop(["price"], 1, inplace=True)
+
+        fit, d = fit_linear_regression(new_train.T, my_price)
+
+        prediction = predict(test_dt.T, fit)
+
+        all_mse.append(mse(test_price, prediction))
+
+
+    plt.plot(np.arange(1,101),all_mse)
+    plt.title("Q16 : MSE depending on the test set (func of p%)")
+    plt.xlabel("% of training")
+    plt.ylabel("MSE")
+    plt.show()
+
+#Task 16
+my_dt, _price = load_data("kc_house_data.csv")
+train_test_set_random(my_dt,_price)
 
 
 def feature_evaluation(matrix, response_vect):
@@ -133,12 +171,12 @@ def feature_evaluation(matrix, response_vect):
     matrix.drop(["base"], 1, inplace=True)
     # print(matrix.columns)
 
-    for column in matrix.columns :
+    for column in matrix.columns[:17] :
         first = np.cov(matrix[column], response_vect)
         scd = np.std(response_vect) * np.std(matrix[column])
         correlation = first / scd
         plt.scatter(matrix[column], response_vect)
-        plt.title("Scatter plot of the " + str(column) + " column and the response value.\nPearson Correlation : %f" % correlation[1][0])
+        plt.title("Q17 : Scatter plot of the " + str(column) + " column and the response value.\nPearson Correlation : %f" % correlation[1][0])
         plt.xlabel(column)
         plt.ylabel("Response value")
         plt.show()
