@@ -75,7 +75,8 @@ def load_data(path):
 
     my_dt.insert(loc=0, column="base", value=[1 for i in range(len(my_dt))])
 
-    my_dt = pandas.get_dummies(my_dt, columns=["zipcode"])
+    # my_dt = pandas.get_dummies(my_dt, columns=["zipcode"])
+    my_dt.drop(["zipcode"], 1, inplace=True)
 
     return my_dt, my_price
 
@@ -128,9 +129,11 @@ def feature_evaluation(matrix, response_vect):
     :param response_vect: response vector
     :return:
     """
-    print(matrix.columns)
 
-    for column in matrix.columns[1:18] :
+    matrix.drop(["base"], 1, inplace=True)
+    # print(matrix.columns)
+
+    for column in matrix.columns :
         first = np.cov(matrix[column], response_vect)
         scd = np.std(response_vect) * np.std(matrix[column])
         correlation = first / scd
@@ -138,9 +141,9 @@ def feature_evaluation(matrix, response_vect):
         plt.title("Scatter plot of the " + str(column) + " column and the response value.\nPearson Correlation : %f" % correlation[1][0])
         plt.xlabel(column)
         plt.ylabel("Response value")
-        # plt.show()
+        plt.show()
 
 
 # Task 17
-my_dt, price = load_data("kc_house_data.csv")
-feature_evaluation(my_dt, price)
+# my_dt, price = load_data("kc_house_data.csv")
+# feature_evaluation(my_dt, price)

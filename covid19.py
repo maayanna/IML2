@@ -26,12 +26,14 @@ def all_tasks(path):
     my_dt.insert(3, "log_detected", np.log(my_dt["detected"]))
 
     # Task 20
+
     my_dt.insert(4, "lst_one", [1 for i in range(len(my_dt))])
-    fit = fit_linear_regression(my_dt[["day_num", "lst_one"]].T, my_dt["log_detected"])
+
+    new_dt = my_dt[["day_num", "lst_one"]]
+
+    fit = fit_linear_regression(new_dt.T, my_dt["log_detected"])
 
     # Tak 21
-
-    new_dt = my_dt[["day_num","lst_one"]].to_numpy()
 
     # First plot
     
