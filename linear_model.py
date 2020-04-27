@@ -69,7 +69,8 @@ def load_data(path):
 
     # Delete all no relevant data
     my_dt.drop(["id", "date"], axis=1, inplace=True)
-    # my_dt.drop(['long', 'lat', 'id', 'date', 'yr_built'], axis=1, inplace=True)
+    # my_dt.drop(['long', 'lat', 'id', 'date', 'yr_built', 'condition', 'sqft_lot', 'sqft_lot15',
+    #                 'yr_renovated'], axis=1, inplace=True)
 
     # Q13
     my_price = my_dt["price"]
@@ -153,8 +154,8 @@ def train_test_set_random(data, price):
     plt.show()
 
 #Task 16
-my_dt, _price = load_data("kc_house_data.csv")
-train_test_set_random(my_dt,_price)
+# my_dt, _price = load_data("kc_house_data.csv")
+# train_test_set_random(my_dt,_price)
 
 
 def feature_evaluation(matrix, response_vect):
@@ -171,7 +172,7 @@ def feature_evaluation(matrix, response_vect):
     matrix.drop(["base"], 1, inplace=True)
     # print(matrix.columns)
 
-    for column in matrix.columns[:17] :
+    for column in matrix.columns:
         first = np.cov(matrix[column], response_vect)
         scd = np.std(response_vect) * np.std(matrix[column])
         correlation = first / scd
